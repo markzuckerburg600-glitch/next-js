@@ -12,6 +12,7 @@
     "framer-motion": "^12.34.4",
     "lucide-react": "^0.576.0",
     "mongodb": "^7.1.0",
+    "mongoose": "^9.2.3",
     "next": "16.1.6",
     "ogl": "^1.0.11",
     "posthog-js": "^1.357.1",

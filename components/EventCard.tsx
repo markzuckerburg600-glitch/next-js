@@ -7,7 +7,7 @@ import { Event } from "@/lib/constants"
 export default function EventCard({ title, image, id, url, description, date, location, type, tags}: Event) {
   return (
     <motion.div 
-      className = "hover:scale-105 transition-transform duration-200 border-2 border-gray-900 rounded-lg p-4 h-full flex flex-col bg-gray-800"
+      className = "hover:scale-105 transition-transform duration-200 border-2 border-gray-900 rounded-lg p-4 h-full flex flex-col bg-amber-50"
       whileHover={{ scale: 1.05 }}
       transition={{ duration: 0.2 }}
       initial={{ opacity: 0, y: 20 }}
