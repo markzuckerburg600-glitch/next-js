@@ -1,5 +1,4 @@
 import Link from "next/link"
-import Image from "next/image"
 import { Panda } from "lucide-react"
 
 export default function Navbar() {
@@ -12,10 +11,10 @@ export default function Navbar() {
                 <p> Dev Event</p>
             </Link>
 
-            <ul>
-                <Link href="/">Home</Link>
-                <Link href="/">Events</Link>
-                <Link href="/">Create Event</Link>
+            <ul className="flex space-x-6">
+                <li><Link href="/">Home</Link></li>
+                <li><Link href="/">Events</Link></li>
+                <li><Link href="/">Create Event</Link></li>
             </ul>
         </nav>
     </header>
