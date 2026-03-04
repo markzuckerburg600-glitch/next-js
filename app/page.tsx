@@ -1,11 +1,29 @@
 "use client"
 import ExploreBtn from "@/components/ExploreBtn"
 import EventCard from "@/components/EventCard"
-import { upcomingEvents } from "@/lib/constants"
 import { motion } from "framer-motion"
+import { IEvent } from "@/database/event.model"
+import { useState, useEffect } from "react"
+import CreateNewButton from "@/components/CreateNewButton"
+import axios from "axios"
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL 
 
-export default function page() {
+export default function Page() {
+  const [events, setEvents] = useState<IEvent[]>([])
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get(`${BASE_URL}/api/events`);
+        setEvents(response.data.events || [])
+      } catch (error) {
+        console.error("Failed to fetch events:", error)
+      }
+    }
+
+    fetchEvents()
+  }, [])
 
   return (
     <div>
@@ -49,7 +67,7 @@ export default function page() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.8 }}
           >
-            {upcomingEvents.map((event, i) => (
+            {events?.map((event: IEvent, i: number) => (
               <motion.li 
                 key={i} 
                 className = "list-none"
@@ -57,11 +75,12 @@ export default function page() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.1 * i }}
               >
-                <EventCard {...event}/>
+                <EventCard {...event} />
               </motion.li>
             ))}
           </motion.ul>
         </div>
+        <CreateNewButton />
       </section>
     </div>
   )

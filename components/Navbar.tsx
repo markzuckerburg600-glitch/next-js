@@ -11,7 +11,7 @@ export default function Navbar() {
                 <p> Dev Event</p>
             </Link>
 
-            <ul className="flex space-x-6">
+            <ul className="flex space-x-6 list-none">
                 <li><Link href="/">Home</Link></li>
                 <li><Link href="/">Events</Link></li>
                 <li><Link href="/">Create Event</Link></li>

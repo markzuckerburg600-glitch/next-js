@@ -165,12 +165,10 @@ EventSchema.pre('save', async function(next) {
       }
     }
   }
-  
-  next()
 })
 
 // Add unique index to slug
 EventSchema.index({ slug: 1 }, { unique: true })
 
-// Create and export the Event model
-export const Event = mongoose.model<IEvent>('Event', EventSchema)
+// Create and export the Event model with conditional export to prevent overwriting
+export const Event = mongoose.models.Event || mongoose.model<IEvent>('Event', EventSchema)
