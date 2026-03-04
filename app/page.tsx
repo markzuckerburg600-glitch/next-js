@@ -1,24 +1,60 @@
 "use client"
+
+import { useState, useEffect } from "react"
 import ExploreBtn from "@/components/ExploreBtn"
 import EventCard from "@/components/EventCard"
+import EventSearch from "@/components/EventSearch"
 import { motion } from "framer-motion"
+import { trackEvent } from "@/lib/posthog"
 import { IEvent } from "@/database/event.model"
-import { useState, useEffect } from "react"
 import CreateNewButton from "@/components/CreateNewButton"
-import axios from "axios"
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
+
+interface EventData {
+  _id: string
+  title: string
+  slug: string
+  description: string
+  overview: string
+  image: string
+  venue: string
+  location: string
+  date: string
+  time: string
+  mode: string
+  audience: string
+  agenda: string[]
+  organizer: string
+  tags: string[]
+  createdAt: string
+  updatedAt: string
+}
+
+type EventCardProps = Omit<EventData, 'overview' | 'agenda' | 'organizer' | 'createdAt' | 'updatedAt'> & { index?: number }
 
 export default function Page() {
-  const [events, setEvents] = useState<IEvent[]>([])
+  const [events, setEvents] = useState<EventData[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/api/events`);
-        setEvents(response.data.events || [])
+        setLoading(true)
+        const response = await fetch(`${BASE_URL}/api/events`, {
+          next: { revalidate: 300 } // Cache for 5 minutes
+        });
+        const data = await response.json()
+        setEvents(data.events || [])
+        
+        // Track page view
+        trackEvent("home_page_view", {
+          eventCount: data.events?.length || 0
+        })
       } catch (error) {
         console.error("Failed to fetch events:", error)
+      } finally {
+        setLoading(false)
       }
     }
 
@@ -61,26 +97,60 @@ export default function Page() {
             Featured Events
           </motion.h3>
 
-          <motion.ul 
-            className = "events grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto"
+          {/* Search and Filter Component */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+            className="w-full max-w-6xl mx-auto"
+          >
+            <EventSearch 
+              events={events as unknown as IEvent[]}
+              onFilter={() => {}} // Client component, filtering handled client-side
+              isLoading={loading}
+            />
+          </motion.div>
+
+          {/* Results Count */}
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
+            transition={{ duration: 0.4 }}
+            className="text-gray-300 text-center mb-4"
           >
-            {events?.map((event: IEvent, i: number) => (
-              <motion.li 
-                key={i} 
-                className = "list-none"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.1 * i }}
-              >
-                <EventCard {...event} />
-              </motion.li>
-            ))}
-          </motion.ul>
+            {loading ? (
+              "Loading events..."
+            ) : events.length === 0 ? (
+              "No events found"
+            ) : (
+              `Showing ${events.length} events`
+            )}
+          </motion.div>
+
+          {!loading && (
+            <motion.ul 
+              className = "events grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 1.0 }}
+            >
+              {events?.map((event: EventCardProps, i: number) => (
+                <motion.li 
+                  key={event._id} 
+                  className = "list-none"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1 * i }}
+                >
+                  <EventCard {...event} index={i} />
+                </motion.li>
+              ))}
+            </motion.ul>
+          )}
         </div>
-        <CreateNewButton />
+        <div className="text-center">
+          <CreateNewButton />
+        </div>
       </section>
     </div>
   )

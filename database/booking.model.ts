@@ -36,14 +36,15 @@ const BookingSchema: Schema = new Schema({
 
 // Pre-save hook to validate event existence
 BookingSchema.pre('save', async function(next) {
-  const booking = this as any
+  const booking = this as any // Use any for Mongoose document context
   
   // Check if the referenced event exists
   if (this.isModified('eventId') || this.isNew) {
     try {
       const event = await Event.findById(booking.eventId)
       if (!event) {
-        throw new Error('Referenced event does not exist')
+        const error = new Error('Referenced event does not exist')
+        return next(error)
       }
     } catch (error) {
       return next(error as Error)
@@ -56,5 +57,5 @@ BookingSchema.pre('save', async function(next) {
 // Add index on eventId for faster queries
 BookingSchema.index({ eventId: 1 })
 
-// Create and export the Booking model
-export const Booking = mongoose.model<IBooking>('Booking', BookingSchema)
+// Create and export the Booking model with conditional export to prevent overwriting
+export const Booking = mongoose.models.Booking || mongoose.model<IBooking>('Booking', BookingSchema)

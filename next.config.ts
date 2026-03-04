@@ -2,8 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
+  cacheComponents: true,
   experimental: {
-    cacheComponents: true,
+    turbopackFileSystemCacheForDev: true
   },
   /* config options here */
   images: {

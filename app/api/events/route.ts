@@ -12,8 +12,8 @@ export async function POST(req: NextRequest) {
         const event = body;
 
         // Validate required fields
-        const requiredFields = ['title', 'description', 'overview', 'image', 'venue', 'location', 'date', 'time', 'mode', 'audience', 'agenda', 'organizer', 'tags'];
-        const missingFields = requiredFields.filter(field => !event[field]);
+        const allowedFields = ['title', 'description', 'overview', 'image', 'venue', 'location', 'date', 'time', 'mode', 'audience', 'agenda', 'organizer', 'tags'];
+        const missingFields = allowedFields.filter(field => !event[field]);
         
         if (missingFields.length > 0) {
             return NextResponse.json({ 
@@ -23,7 +23,15 @@ export async function POST(req: NextRequest) {
             });
         }
 
-        const createdEvent = await Event.create(event);
+        // Create whitelisted payload
+        const whitelistedEvent = allowedFields.reduce((acc: Record<string, unknown>, field) => {
+            if (event[field] !== undefined) {
+                acc[field] = event[field];
+            }
+            return acc;
+        }, {} as Record<string, unknown>);
+
+        const createdEvent = await Event.create(whitelistedEvent);
         
         return NextResponse.json({ 
             message: "Event created successfully", 
@@ -32,13 +40,9 @@ export async function POST(req: NextRequest) {
     } catch (error) {
         console.error("Event creation error:", error);
         return NextResponse.json({ 
-            message: "Internal server error", 
-            error: error instanceof Error ? error.message : "Unknown error" 
+            message: "Internal server error" 
         }, { 
-            status: 500,
-            headers: {
-                "Content-Type": "application/json",
-            },
+            status: 500 
         });
     }
 }
@@ -47,18 +51,14 @@ export async function GET() {
     try {
         await connectToDB();
         // Sort by newest first
-        const events = await (Event.find()).sort({ createdAt: -1 });
+        const events = await Event.find().sort({ createdAt: -1 });
         return NextResponse.json({ events });
     } catch (error) {
         console.error("Event retrieval error:", error);
         return NextResponse.json({ 
-            message: "Internal server error", 
-            error: error instanceof Error ? error.message : "Unknown error" 
+            message: "Internal server error" 
         }, { 
-            status: 500,
-            headers: {
-                "Content-Type": "application/json",
-            },
+            status: 500 
         });
     }
 }

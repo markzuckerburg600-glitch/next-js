@@ -6,9 +6,14 @@ import { IEvent } from "@/database/event.model"
 
 export default function CreateNewButton() {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const handleSubmit = async (eventData: IEvent) => {
     try {
+      setIsSubmitting(true)
+      setSubmitError(null)
+      
       // Send JSON data (not form-data)
       await axios.post("/api/events", eventData)
       setIsModalOpen(false)
@@ -17,6 +22,9 @@ export default function CreateNewButton() {
       window.location.reload()
     } catch (error) {
       console.error("Error creating event:", error)
+      setSubmitError("Failed to create event. Please try again.")
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -31,8 +39,13 @@ export default function CreateNewButton() {
 
       <EventModal 
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false)
+          setSubmitError(null)
+        }}
         onSubmit={handleSubmit}
+        isSubmitting={isSubmitting}
+        submitError={submitError}
       />
     </div>
   )
