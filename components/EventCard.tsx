@@ -1,68 +1,93 @@
 "use client"
-import Link from "next/link"
 import React from "react"
 import { motion } from "framer-motion"
-import { Event } from "@/lib/constants"
+import { IEvent } from "@/database/event.model"
+import Image from "next/image"
+import Link from "next/link"
 
-export default function EventCard({ title, image, id, url, description, date, location, type, tags}: Event) {
+export default function EventCard({ 
+  title, 
+  slug, 
+  description, 
+  overview, 
+  image, 
+  venue, 
+  location, 
+  date, 
+  time, 
+  mode, 
+  audience, 
+  agenda, 
+  organizer, 
+  tags, 
+  createdAt, 
+  updatedAt,
+}: IEvent) {
+  const transitionIndex = 2
   return (
+    <Link href={`/event/${slug}`}>
     <motion.div 
-      className = "hover:scale-105 transition-transform duration-200 border-2 border-gray-900 rounded-lg p-4 h-full flex flex-col bg-amber-50"
-      whileHover={{ scale: 1.05 }}
-      transition={{ duration: 0.2 }}
+      id="event-card"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: transitionIndex * 0.1 }}
+      className="glass card-shadow p-6 hover:scale-105 transition-transform duration-300"
     >
-      <Link href = {`/events/${id}`}>
-        <motion.div 
-          className = "poster"
-          whileHover={{ scale: 1.1 }}
-          transition={{ duration: 0.3 }}
-        >
-          {/* Image */}
-          {React.createElement(image, { size: 40 })}
-        </motion.div>
-        <h3>{title}</h3> <br/>
-
-        <motion.p 
-          className = "hover:text-blue-100 transition-colors duration-200"
-          whileHover={{ scale: 1.02 }}
-        >
-          {description}
-        </motion.p> <br/>
-        {/* Optional url */}
-        {url && (
-          <a href={url} target="_blank" rel="noopener noreferrer" className = "text-blue-500 block mb-2">
-            {url}
-          </a>
-        )}
-        <p className = "text-gray-500 font-semibold hover:text-red-100 transition-colors duration-200"> {location} {date}</p> 
-        <br/>
-
-        {/* tags */}
-        <div className = "mb-3 flex flex-wrap gap-2">
-          {tags.map((tag, index) => (
-            <motion.div
-              key={index}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <Link 
-                href={`/events/tag/${tag.toLowerCase()}`}
-                className = "inline-block bg-orange-500 text-white px-3 py-1 rounded-lg text-sm hover:bg-orange-600 transition-colors"
-              >
-                {tag}
-              </Link>
-            </motion.div>
+      {/* Image */}
+      <div className="relative overflow-hidden rounded-lg mb-4 group">
+        <Image 
+          src={image} 
+          alt={title} 
+          width={400} 
+          height={300}
+          className="poster w-full h-75 object-cover transition-all duration-500 ease-out group-hover:scale-110 group-hover:brightness-110 group-hover:contrast-110"
+        />
+        {/* Overlay gradient */}
+        <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        {/* Shimmer effect */}
+        <div className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full transition-transform duration-1000 ease-out" />
+      </div>
+      
+      <h2 className="title text-gradient">{title}</h2>
+      
+      <p className="line-clamp-2 mb-3">{description}</p>
+      
+      {/* Datetime */}
+      <div className="datetime mb-4 hover:bg-gray-700 rounded-lg p-2">
+        <div className="flex items-center gap-2">
+          <span className="text-primary">📅</span>
+          <span>{date}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-primary">Created at</span>
+          <span>{time} 🕐</span>
+        </div>
+      </div>
+      {/* Location */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex items-center gap-2">
+          <span className="text-primary">📍</span>
+          <span className="text-sm">{venue}, {location}</span>
+        </div>
+      </div>
+      
+      <div className="flex flex-wrap gap-2 mb-4">
+        <span className="pill">{mode}</span>
+        <span className="pill">{audience}</span>
+      </div>
+      
+      {tags && tags.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {tags.map((tag: string, tagIndex: number) => (
+            <div key={tagIndex} className="flex items-center gap-1">
+              <code className="text-xs px-3 py-1 bg-blue-500 rounded-full border border-blue-400 text-white hover:bg-blue-600 transition-colors cursor-pointer">
+                {tag.trim()}
+              </code>
+            </div>
           ))}
         </div>
-        <motion.code 
-          className = "bg-blue-500 text-white px-2 py-1 rounded"
-          whileHover={{ scale: 1.05 }}
-        >
-        {type}
-        </motion.code>
-      </Link>
+      )}
     </motion.div>
+    </Link>
   )
 }

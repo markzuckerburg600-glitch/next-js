@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "axios": "^1.13.6",
+    "babel-plugin-react-compiler": "^1.0.0",
     "framer-motion": "^12.34.4",
     "lucide-react": "^0.576.0",
     "mongodb": "^7.1.0",
@@ -17,7 +19,8 @@
     "ogl": "^1.0.11",
     "posthog-js": "^1.357.1",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "styled-components": "^6.3.11"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
