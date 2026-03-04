@@ -10,10 +10,9 @@ import { trackEvent } from "@/lib/posthog";
 // Dynamic import to ensure client-side only
 const DynamicMotion = typeof window !== 'undefined' ? motion : null;
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 
 const getEventBySlug = async (slug: string) => {
-  const response = await fetch(`${BASE_URL}/api/events/${slug}`, { 
+  const response = await fetch(`/api/events/${slug}`, { 
     next: { revalidate: 3600 },
     cache: 'force-cache'
   });
@@ -22,7 +21,7 @@ const getEventBySlug = async (slug: string) => {
 };
 
 const getRegistrationCount = async (eventId: string) => {
-  const response = await fetch(`${BASE_URL}/api/events/register?eventId=${eventId}`, {
+  const response = await fetch(`/api/events/register?eventId=${eventId}`, {
     next: { revalidate: 60 }, // Revalidate registration count more frequently
     cache: 'no-store' // Don't cache registration count to keep it real-time
   });

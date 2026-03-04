@@ -2,6 +2,18 @@ import { connectToDB } from "@/lib/mongodb";
 import { NextRequest, NextResponse } from "next/server";
 import { Event } from "@/database/event.model";
 
+// Handle CORS preflight requests
+export async function OPTIONS() {
+    return new NextResponse(null, {
+        status: 200,
+        headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        },
+    });
+}
+
 // Handle JSON POST event
 export async function POST(req: NextRequest) {
     try {
@@ -36,6 +48,12 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ 
             message: "Event created successfully", 
             event: createdEvent 
+        }, {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+            }
         });
     } catch (error) {
         console.error("Event creation error:", error);
@@ -52,7 +70,13 @@ export async function GET() {
         await connectToDB();
         // Sort by newest first
         const events = await Event.find().sort({ createdAt: -1 });
-        return NextResponse.json({ events });
+        return NextResponse.json({ events }, {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+            }
+        });
     } catch (error) {
         console.error("Event retrieval error:", error);
         return NextResponse.json({ 

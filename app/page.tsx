@@ -9,7 +9,6 @@ import { trackEvent } from "@/lib/posthog"
 import { IEvent } from "@/database/event.model"
 import CreateNewButton from "@/components/CreateNewButton"
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
 
 interface EventData {
   _id: string
@@ -41,7 +40,7 @@ export default function Page() {
     const fetchEvents = async () => {
       try {
         setLoading(true)
-        const response = await fetch(`${BASE_URL}/api/events`, {
+        const response = await fetch('/api/events', {
           next: { revalidate: 300 } // Cache for 5 minutes
         });
         const data = await response.json()
