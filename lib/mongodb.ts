@@ -11,6 +11,7 @@ let connectionState: MongoConnectionState = {
   isConnected: false,
   connection: null
 }
+let connectionPromise: Promise<void> | null = null
 
 /**
  * Connects to MongoDB database using Mongoose
@@ -18,50 +19,68 @@ let connectionState: MongoConnectionState = {
  * @returns Promise<void>
  */
 export const connectToDB = async (): Promise<void> => {
+  // Return existing connection promise if one is in progress
+  if (connectionPromise) {
+    return connectionPromise
+  }
+
   // Return early if already connected
   if (connectionState.isConnected && connectionState.connection) {
     console.log('MongoDB already connected')
     return
   }
 
-  try {
-    // Validate environment variable
-    const mongoUri = process.env.MONGODB_URI
-    if (!mongoUri) {
-      throw new Error('MONGODB_URI environment variable is not defined')
-    }
+  // Create connection promise
+  connectionPromise = (async () => {
+    try {
+      // Validate environment variable
+      const mongoUri = process.env.MONGODB_URI
+      if (!mongoUri) {
+        throw new Error('MONGODB_URI environment variable is not defined')
+      }
 
-    // Connect to MongoDB with connection options
-    const connection = await mongoose.connect(mongoUri, {
-      maxPoolSize: 10, // Maximum number of socket connections
-      serverSelectionTimeoutMS: 5000, // How long to try selecting a server
-      socketTimeoutMS: 45000, // How long a send or receive on a socket can take
-    })
+      // Connect to MongoDB with connection options
+      const connection = await mongoose.connect(mongoUri, {
+        maxPoolSize: 10, // Maximum number of socket connections
+        serverSelectionTimeoutMS: 5000, // How long to try selecting a server
+        socketTimeoutMS: 45000, // How long a send or receive on a socket can take
+      })
 
-    // Update connection state
-    connectionState = {
-      isConnected: true,
-      connection: connection.connection
-    }
+      // Update connection state
+      connectionState = {
+        isConnected: true,
+        connection: connection.connection
+      }
 
-    console.log('MongoDB connected successfully')
-    
-    // Set up connection event listeners
-    connection.connection.on('error', (error) => {
+      console.log('MongoDB connected successfully')
+      
+      // Set up connection event listeners
+      connection.connection.on('error', (error) => {
+        console.error('MongoDB connection error:', error)
+        connectionState.isConnected = false
+        connectionState.connection = null
+        connectionPromise = null
+      })
+
+      connection.connection.on('disconnected', () => {
+        console.log('MongoDB disconnected')
+        connectionState.isConnected = false
+        connectionState.connection = null
+        connectionPromise = null
+      })
+
+    } catch (error) {
       console.error('MongoDB connection error:', error)
       connectionState.isConnected = false
-    })
+      connectionState.connection = null
+      connectionPromise = null
+      throw error
+    } finally {
+      connectionPromise = null
+    }
+  })()
 
-    connection.connection.on('disconnected', () => {
-      console.log('MongoDB disconnected')
-      connectionState.isConnected = false
-    })
-
-  } catch (error) {
-    console.error('MongoDB connection error:', error)
-    connectionState.isConnected = false
-    throw error
-  }
+  return connectionPromise
 }
 
 /**

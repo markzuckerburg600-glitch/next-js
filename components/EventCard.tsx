@@ -1,15 +1,33 @@
 "use client"
 import React from "react"
 import { motion } from "framer-motion"
-import { IEvent } from "@/database/event.model"
 import Image from "next/image"
 import Link from "next/link"
+
+interface EventData {
+  _id: string
+  title: string
+  slug: string
+  description: string
+  overview: string
+  image: string
+  venue: string
+  location: string
+  date: string
+  time: string
+  mode: string
+  audience: string
+  agenda: string[]
+  organizer: string
+  tags: string[]
+  createdAt: string
+  updatedAt: string
+}
 
 export default function EventCard({ 
   title, 
   slug, 
   description, 
-  overview, 
   image, 
   venue, 
   location, 
@@ -17,13 +35,10 @@ export default function EventCard({
   time, 
   mode, 
   audience, 
-  agenda, 
-  organizer, 
   tags, 
-  createdAt, 
-  updatedAt,
-}: IEvent) {
-  const transitionIndex = 2
+  index = 0
+}: Omit<EventData, 'overview' | 'agenda' | 'organizer' | 'createdAt' | 'updatedAt'> & { index?: number }) {
+  const transitionIndex = index
   return (
     <Link href={`/event/${slug}`}>
     <motion.div 
@@ -59,7 +74,7 @@ export default function EventCard({
           <span>{date}</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-primary">Created at</span>
+          <span className="text-primary">Time</span>
           <span>{time} 🕐</span>
         </div>
       </div>

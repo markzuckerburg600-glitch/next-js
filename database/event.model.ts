@@ -135,10 +135,17 @@ EventSchema.pre('save', async function(next) {
     // Ensure slug is unique
     let uniqueSlug = baseSlug
     let counter = 1
+    const MAX_SLUG_ATTEMPTS = 100
     
-    while (await mongoose.models.Event?.findOne({ slug: uniqueSlug })) {
+    while (counter <= MAX_SLUG_ATTEMPTS && await mongoose.models.Event?.findOne({ slug: uniqueSlug })) {
       uniqueSlug = `${baseSlug}-${counter}`
       counter++
+    }
+    
+    if (counter > MAX_SLUG_ATTEMPTS) {
+      // Fallback to timestamp-based slug
+      uniqueSlug = `${baseSlug}-${Date.now()}`
+      console.warn(`Slug generation exceeded ${MAX_SLUG_ATTEMPTS} attempts, using timestamp fallback: ${uniqueSlug}`)
     }
     
     event.slug = uniqueSlug
@@ -165,6 +172,8 @@ EventSchema.pre('save', async function(next) {
       }
     }
   }
+  
+  next()
 })
 
 // Add unique index to slug

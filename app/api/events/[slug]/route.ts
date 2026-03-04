@@ -1,5 +1,5 @@
-import { connectToDB } from "@/lib/mongodb";
 import { NextRequest, NextResponse } from "next/server";
+import { connectToDB } from "@/lib/mongodb";
 import { Event } from "@/database/event.model";
 
 export async function GET(
@@ -7,9 +7,9 @@ export async function GET(
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    await connectToDB();
     const { slug } = await params;
     
+    await connectToDB();
     // Find event by slug
     const event = await Event.findOne({ slug });
     
@@ -25,13 +25,9 @@ export async function GET(
   } catch (error) {
     console.error("Event retrieval error:", error);
     return NextResponse.json({ 
-      message: "Internal server error", 
-      error: error instanceof Error ? error.message : "Unknown error" 
+      message: "Internal server error" 
     }, { 
-      status: 500,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      status: 500 
     });
   }
 }

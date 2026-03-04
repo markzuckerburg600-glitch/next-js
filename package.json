@@ -20,6 +20,7 @@
     "posthog-js": "^1.357.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-select": "^5.10.2",
     "styled-components": "^6.3.11"
   },
   "devDependencies": {
