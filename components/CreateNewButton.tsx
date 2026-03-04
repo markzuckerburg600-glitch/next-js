@@ -23,7 +23,7 @@ export default function CreateNewButton() {
   return (
     <div className = "flex justify-center align-middle flex-col items-center">
       <button 
-        className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+        className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors mt-10"
         onClick={() => setIsModalOpen(true)}
       >
         <p className="text-lg font-semibold">Create New Event</p>

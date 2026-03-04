@@ -19,7 +19,8 @@
     "ogl": "^1.0.11",
     "posthog-js": "^1.357.1",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "styled-components": "^6.3.11"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

@@ -250,6 +250,32 @@
     @apply bg-dark-100 text-light-100 text-xs rounded-[6px] px-5 py-2;
   }
 
+  /* Cool Image Hover Effects */
+  .image-hover-glow {
+    @apply transition-all duration-300 hover:shadow-[0_0_30px_rgba(89,222,202,0.3)] hover:shadow-cyan-500/50;
+  }
+
+  .image-hover-tilt {
+    @apply transition-transform duration-300 hover:rotate-1 hover:scale-105;
+  }
+
+  .image-hover-blur {
+    @apply transition-all duration-500 hover:backdrop-blur-sm;
+  }
+
+  .shimmer-effect {
+    @apply relative overflow-hidden;
+  }
+
+  .shimmer-effect::before {
+    content: '';
+    @apply absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000;
+  }
+
+  .shimmer-effect:hover::before {
+    @apply translate-x-full;
+  }
+
   #book-event {
     @apply flex flex-col gap-6;
 
