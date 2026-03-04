@@ -35,7 +35,7 @@ const BookingSchema: Schema = new Schema({
 })
 
 // Pre-save hook to validate event existence
-BookingSchema.pre('save', async function(next) {
+BookingSchema.pre('save', async function() {
   const booking = this as any // Use any for Mongoose document context
   
   // Check if the referenced event exists
@@ -43,15 +43,12 @@ BookingSchema.pre('save', async function(next) {
     try {
       const event = await Event.findById(booking.eventId)
       if (!event) {
-        const error = new Error('Referenced event does not exist')
-        return next(error)
+        throw new Error('Referenced event does not exist')
       }
     } catch (error) {
-      return next(error as Error)
+      throw error
     }
   }
-  
-  next()
 })
 
 // Add index on eventId for faster queries

@@ -119,7 +119,7 @@ const EventSchema: Schema = new Schema({
 })
 
 // Pre-save hook for slug generation and data normalization
-EventSchema.pre('save', async function(next) {
+EventSchema.pre('save', async function() {
   const event = this as any
   
   // Only regenerate slug if title has changed
@@ -172,8 +172,6 @@ EventSchema.pre('save', async function(next) {
       }
     }
   }
-  
-  next()
 })
 
 // Add unique index to slug
